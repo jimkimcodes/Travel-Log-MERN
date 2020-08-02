@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden !important;
+}
+
+.entry-comment {
+  max-width: 300px;
+}
+
+.log-entry-form {
+  position: fixed;
+  bottom: 20px;
+  width: 97vw;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.5s ease-in-out;
+}
+
+.log-entry-form.show {
+  visibility: visible;
+  opacity: 1;
+}
