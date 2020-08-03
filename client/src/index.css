@@ -8,21 +8,79 @@ body {
   overflow: hidden !important;
 }
 
+::selection {
+  background-color: #ffe46a;
+  color: black;
+}
+
 .entry-comment {
   max-width: 300px;
 }
 
-.log-entry-form {
+.logo-svg {
+  margin-top: 8px;
+}
+
+.logo-text {
+  height: 38px;
+  margin-top: 10px;
+
+}
+
+.navbar {
+  box-shadow: 0px -5px 15px 3px rgba(105,105,105,1);
+  background-image: linear-gradient( 111.5deg,  rgba(228,247,255,1) 21.9%, rgba(255,216,194,1) 92.2% );
+}
+
+.navbar-brand {
+  margin: auto;
+}
+
+.bottom-container {
   position: fixed;
   bottom: 20px;
-  width: 97vw;
+  width: 100vw;
+  z-index: 20;
 
   visibility: hidden;
   opacity: 0;
   transition: visibility 0s, opacity 0.5s ease-in-out;
 }
 
-.log-entry-form.show {
+.bottom-container.pin-detail {
+  bottom: 10px;
+  width: 100vw;
+}
+
+.bottom-container.show {
   visibility: visible;
   opacity: 1;
+}
+
+.pin-image {
+  max-height: 250px;
+}
+
+.footer-bottom {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+}
+
+.fa-heart {
+  animation: pound 0.35s infinite alternate;
+}
+
+.fa-coffee {
+  color: #77450f;
+}
+
+@keyframes pound {
+  to {
+    transform: scale(1.3)
+  }
+}
+
+.box {
+  box-shadow: 0px 7px 16px -5px rgba(0,0,0,0.39);
 }

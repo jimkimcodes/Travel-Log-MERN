@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import ReactMapGL, { Marker } from 'react-map-gl';
 import Popup from './Popup';
 import LogEntryForm from './LogEntryForm';
-import listLogEntries from './api';
+import { listLogEntries } from './api';
+import PinDetails from './PinDetails';
 
 const Map = () => {
   const [logEntries, setLogEntries] = useState([]);
   const [showPopup, setShowPopup] = useState({});
+  const [showPinDetails, setShowPinDetails] = useState(null);
   const [pinLocation, setPinLocation] = useState(null);
   const [viewport, setViewport] = useState({
     width: '100vw',
@@ -17,11 +19,13 @@ const Map = () => {
     zoom: 6.8
   });
 
+  const getLogEntries = async () => {
+    const logEntries = await listLogEntries();
+    setLogEntries(logEntries);
+  }
+
   useEffect(() => {
-    (async () => {
-      const logEntries = await listLogEntries();
-      setLogEntries(logEntries);
-    })();
+    getLogEntries();
   }, []);
 
   const showPinLocationForm = (event) => {
@@ -36,6 +40,9 @@ const Map = () => {
     if (pinLocation) {
       setPinLocation(null);
     }
+    if (showPinDetails) {
+      setShowPinDetails(null);
+    }
   }
 
   return (
@@ -46,14 +53,16 @@ const Map = () => {
         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         onViewportChange={nextViewport => setViewport(nextViewport)}
 
-        onDblClick={showPinLocationForm}
+        onDblClick={(event) => {
+          showPinLocationForm(event);
+          setShowPinDetails(null);
+        }}
         onClick={closePinLocation}
       >
         {
           logEntries.map(entry => (
-            <>
+            <React.Fragment key={entry._id}>
               <Marker
-                key={entry._id}
                 latitude={entry.latitude}
                 longitude={entry.longitude}
               >
@@ -65,9 +74,13 @@ const Map = () => {
                   onMouseOver={() => setShowPopup({
                     ...showPopup,
                     [entry._id]: true,
-                  }
-                  )}
+                  })}
                   onMouseOut={() => setShowPopup({})}
+
+                  onClick={() => {
+                    setShowPinDetails(entry)
+                    setPinLocation(null)
+                  }}
                 >
                   <svg
                     style={{
@@ -82,7 +95,7 @@ const Map = () => {
               {
                 showPopup[entry._id] ? <Popup entry={entry} viewport={viewport} /> : null
               }
-            </>
+            </React.Fragment>
           ))
         }
         {
@@ -115,8 +128,32 @@ const Map = () => {
           ) : null
         }
       </ReactMapGL>
-      <div className={"form mx-4 log-entry-form " + (pinLocation ? "show" : "") } >
-        <LogEntryForm />
+      <div className={"columns is-centered bottom-container " + (pinLocation ? "show" : "") } >
+        <div className="column mx-6">
+          {
+            pinLocation ? (
+              <LogEntryForm
+                onClose={ ()=>{ 
+                  setPinLocation(null);
+                  getLogEntries();
+                }} 
+                location={pinLocation} 
+              />
+            ): null
+          }
+        </div>
+      </div>
+
+      <div className={"columns is-centered pin-detail bottom-container " + (showPinDetails ? "show" : "") } >
+        <div className="column mx-6 is-two-thirds">
+          {
+            showPinDetails ? (
+              <PinDetails
+                entry={showPinDetails} 
+              />
+            ) : null
+          }
+        </div>
       </div>
     </div>
   );
