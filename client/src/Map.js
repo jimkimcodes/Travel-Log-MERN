@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import ReactMapGL, { Marker } from 'react-map-gl';
 import Popup from './Popup';
 import LogEntryForm from './LogEntryForm';
-import { listLogEntries } from './api';
+import { listLogEntries, deleteLogEntry } from './api/api';
 import PinDetails from './PinDetails';
 
 const Map = () => {
@@ -19,9 +20,14 @@ const Map = () => {
     zoom: 6.8
   });
 
+  let history = useHistory();
+
   const getLogEntries = async () => {
     const logEntries = await listLogEntries();
-    setLogEntries(logEntries);
+    if (!logEntries) {
+      history.push('/login');
+    }
+    setLogEntries(logEntries.entries);
   }
 
   useEffect(() => {
@@ -133,9 +139,9 @@ const Map = () => {
           {
             pinLocation ? (
               <LogEntryForm
-                onClose={ ()=>{ 
+                onClose={ async ()=>{ 
                   setPinLocation(null);
-                  getLogEntries();
+                  await getLogEntries();
                 }} 
                 location={pinLocation} 
               />
@@ -145,11 +151,12 @@ const Map = () => {
       </div>
 
       <div className={"columns is-centered pin-detail bottom-container " + (showPinDetails ? "show" : "") } >
-        <div className="column mx-6 is-two-thirds">
+        <div className="column mx-6 is-four-fifths-mobile is-two-thirds">
           {
             showPinDetails ? (
               <PinDetails
                 entry={showPinDetails} 
+                deleteHandler = { async (id)=> {await deleteLogEntry(id); closePinLocation(); await getLogEntries();} }
               />
             ) : null
           }
